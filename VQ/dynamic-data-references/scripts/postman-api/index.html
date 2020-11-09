@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #E2E2E2;
+        font-family: 'Verdana', sans-serif;
+      }
+      h1, h2 {
+        color: darkslategray;
+        text-align: center;
+      }
+      h1 {
+        font-size: 60px;
+        text-transform: uppercase;
+      }
+      #VQ {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 960px;
+        height: 540px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Omma VQ </h1>
+    <h2>Injecting Fetched Data into Player</h2>
+
+    <iframe src="https://api.ommasign.com/v1/contents/play/546da77aaa1479c62ef8f6d5a74e3717339a1c51df7abf18f181feb79b86572f" id="VQ"></iframe>
+    <script>
+      const VQ = document.getElementById('VQ');
+      const url = 'https://reqres.in/api/users';
+
+      const getData = () => {
+        return fetch(url)
+          .then(res => res.json())
+          .catch(err => {return {error: err.toString()}});
+      };
+
+      const main = async destination => {
+        const response = await getData();
+        const error = response.error;
+
+        console.log('Sending data to Player');
+        const data = response.data && response.data.slice(0,3);
+
+        VQ.contentWindow.postMessage(JSON.stringify({
+          eventName: 'useLocals',
+          locals: {
+            error,
+            payload: data
+          }
+        }), '*')
+      }
+
+      window.addEventListener('message', event => {
+        if (event.data == 'ready') {
+          console.log('[HTML] Ready received', event);
+          main(event.source);
+        }
+      });
+
+      window.onload = main;
+    </script>
+  </body>
+</html>
