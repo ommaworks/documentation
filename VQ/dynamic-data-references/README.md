@@ -9,7 +9,7 @@ The value of a `localVariable` can be set through the iframe URL as a key-value 
 
 ![](./assets/vq_url_params_1.png)
 
->[Example preview URL is here](https://api.ommasign.com/v1/contents/play/80b6288a382638a2222d45a0730bcfd9718ab7c4c2f15f17e20f2c909af7324f?name1=George&name2=Charles&name3=Josef&image1=https://s3.amazonaws.com/uifaces/faces/twitter/calebogden/128.jpg&image2=https://s3.amazonaws.com/uifaces/faces/twitter/josephstein/128.jpg&image3=https://s3.amazonaws.com/uifaces/faces/twitter/olegpogodaev/128.jpg)
+>[Example preview URL is here](https://api.ommasign.com/v1/contents/play/3c6f977a61669461122ce58a6a9765e0642bed87261301b9e581d45ff96c0cf5?name1=George&name2=Charles&name3=Josef&image1=https://res.cloudinary.com/demo/image/twitter_name/BillClinton.jpg&image2=https://res.cloudinary.com/demo/image/twitter_name/lancearmstrong.jpg&image3=https://res.cloudinary.com/demo/image/twitter_name/BrunoMars.jpg)
 
 ## 2. Ajax Request  
 VQ contents can run additional javascript codes on the client device before initializing the VQ-player. Thus, given the appropriate APIs, the user is able to customize the scenario as well as the behavior of the VQ-player. One major implication of this power is filling the localVariables dictionary programmatically during this initialization time.  
