@@ -161,3 +161,4 @@ func postMessage(_ data: String) {
 }
 ```
 
+An example project with Swift can be found [here](./swift-example).
