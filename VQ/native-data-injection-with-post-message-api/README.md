@@ -12,7 +12,7 @@ Assume that we have a scene contains 2 people and presents their names and image
 ![](./assets/set-injected-variables.png)
 
 2. Add scene elements uses those variables
-![](./assets/set-injected-variables.png)
+![](./assets/add-scene-element.png)
 
 ## Android Native Implementation  
 There are two main things to run VQ content inside a native WebView:  
