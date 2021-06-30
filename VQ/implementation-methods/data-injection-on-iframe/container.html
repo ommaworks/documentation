@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #E2E2E2;
+        font-family: 'Verdana', sans-serif;
+      }
+      h1, h2 {
+        color: darkslategray;
+        text-align: center;
+      }
+      h1 {
+        font-size: 60px;
+        text-transform: uppercase;
+      }
+      #VQ {
+        position: absolute;
+        left: 50%;
+        top: 55%;
+        transform: translate(-50%, -50%);
+        width: 960px;
+        height: 540px;
+      }
+    </style>
+    <script src="postman.min.js"></script>
+  </head>
+  <body>
+    <h1>Omma VQ </h1>
+    <h2>Injecting Fetched Data into Player</h2>
+
+    <iframe src="" id="VQ" allow="fullscreen"></iframe>
+
+    <script>
+      const VQ = document.getElementById('VQ');
+      const client = postman.createClient(VQ.contentWindow, '*', 0);
+      VQ.src = "https://play.omma.io/cff98092e73af3e415db1207bf3993568d9049b1dae46ed4631c729eb86aad45/index.html?ts=" + Date.now();
+
+      const main = async destination => {
+        const injectData = {
+          'name': 'John',
+          'surname': 'Doe',
+          'segment': 'A' //choose 'A' or 'B' to alternate between flows
+        }
+
+        VQ.contentWindow.postMessage(JSON.stringify({
+
+          eventName: 'useLocals',
+          locals: {
+            payload: injectData
+          }
+        }), '*')
+
+      }
+
+
+      client.on('VQEvent', event => {
+      	console.log(event);
+        if (event.eventName == 'ready_for_data_injection') {
+            main();
+        }
+
+      });
+
+      /*
+        If you don't wanna use "postman.js" you can simply listen for native events as below
+
+        window.addEventListener('message', event => {
+          const data = JSON.parse(event.data);
+          if (data.payload.eventName == 'ready_for_data_injection') {
+              console.log('[HTML] ready_for_data_injection received');
+              main();
+          }
+        });
+      */
+    </script>
+  </body>
+</html>
