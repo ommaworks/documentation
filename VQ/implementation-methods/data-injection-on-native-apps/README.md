@@ -2,18 +2,6 @@
 The personalization of a VQ content boils down to evaluating the decision points and text values on run-time. Every `variable` that is referenced on a scene template can be replaced by its actual value.
 
 
-![](./assets/vq_scene_1.png)
-
-## Create Your Content
-You can create a simple content using OMMA Panel.
-Assume that we have a scene contains 2 people and presents their names and images. Use double curly braces for variables like name1, name2, image1, image2 and so on. Follow the steps below:
-
-1. Create a content and your variables
-![](./assets/set-injected-variables.png)
-
-2. Add scene elements uses those variables
-![](./assets/add-scene-element.png)
-
 ## Android Native Implementation
 There are two main things to run VQ content inside a native WebView:
 - Data flow from javascript side to native side
