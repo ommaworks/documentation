@@ -144,7 +144,7 @@ To send data back to javascript side:
 
 ```swift
 func postMessage(_ data: String) {
-    let js = "window.postMessage('\(data)');"
+    let js = "window.postMessage('\(data)', '*');"
     self.webView!.evaluateJavaScript(js)
 }
 ```
