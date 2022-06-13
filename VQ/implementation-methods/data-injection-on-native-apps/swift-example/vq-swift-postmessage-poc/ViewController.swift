@@ -75,7 +75,7 @@ class ViewController: UIViewController, WKScriptMessageHandler {
     }
     
     func postMessage(_ data: String) {
-        let js = "window.postMessage('\(data)');"
+        let js = "window.postMessage('\(data)', '*');"
         self.webView!.evaluateJavaScript(js)
     }
 }
