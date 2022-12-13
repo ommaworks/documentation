@@ -8,9 +8,10 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController, WKScriptMessageHandler {
+class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDelegate {
 
     var webView: WKWebView?
+    let contentURL = "https://play-test.omma.io/c/x3dASS/index.html"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +22,7 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         webConfiguration.mediaTypesRequiringUserActionForPlayback = []
         
         self.webView = WKWebView(frame: self.view.frame, configuration: webConfiguration)
+        self.webView?.navigationDelegate = self
         self.view.addSubview(self.webView!)
         
         let contentController = self.webView!.configuration.userContentController
@@ -37,7 +39,7 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         let script = WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         contentController.addUserScript(script)
         
-        let url = URL(string: "https://play-test.omma.io/c/x3dASS/index.html")!
+        let url = URL(string: contentURL)!
         let request = URLRequest(url: url)
         self.webView!.load(request)
     }
@@ -71,6 +73,16 @@ class ViewController: UIViewController, WKScriptMessageHandler {
     func postMessage(_ data: String) {
         let js = "window.postMessage('\(data)', '*');"
         self.webView!.evaluateJavaScript(js)
+    }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if let response = navigationResponse.response as? HTTPURLResponse {
+            if response.url != nil && response.url!.absoluteString == contentURL && response.statusCode >= 400 {
+                print("Cannot open VQ Content. Unexpected response code: \(response.statusCode)")
+            }
+        }
+        
+        decisionHandler(.allow)
     }
 }
 
