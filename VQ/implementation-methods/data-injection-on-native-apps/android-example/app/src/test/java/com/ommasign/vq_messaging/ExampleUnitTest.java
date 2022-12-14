@@ -1,4 +1,4 @@
-package com.example.vqmessaging;
+package com.ommasign.vq_messaging;
 
 import org.junit.Test;
 

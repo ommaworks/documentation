@@ -16,27 +16,21 @@ To get events initialized from VQ content, we need a javascript bridging interfa
 ```java
 class MessagingBridge {
     @JavascriptInterface
-    public void send(String eventType, JSONObject payload){ ... }
+    public void send(String data){ ... }
 }
-
-...
 
 webView.addJavascriptInterface(new MessagingBridge(), "MessagingBridge");
 ```
 Proxy events using that messaging bridge
 ```java
 void initMessagingInterface() {
-    String eventListenerScript =
-            "window.addEventListener('message', function (windowEvent) {" +
-            "    const stringifiedData = windowEvent.data;" +
-            "    const event = JSON.parse(stringifiedData);" +
-            "    if (event.name === 'VQEvent') {" +
-            "        const eventName = event.payload.eventName;" +
-            "        const payload = event.payload.payload;" +
-            "        console.log('sendToNativeFromJs', eventName, payload);" +
-            "        window.MessagingBridge.send(eventName, payload);" +
-            "    }" +
-            "  });";
+    String eventListenerScript = """
+       window.addEventListener('message', function (e) {
+            const data = JSON.parse(e.data);
+            if (data.event === 'ready-for-injection')
+                window.MessagingBridge.send(JSON.stringify(data));
+       });
+    """;    
     webView.evaluateJavascript(eventListenerScript, null);
 }
 ```
@@ -59,9 +53,8 @@ window.postMessage(JSON.stringify({ <your-data> }), '*')
 
 Simply we can use a method to execute is from native side.
 ```java
-void postMessage(String context, JSONObject data) {
-    String postMessageScript =
-            "window.postMessage('"+ data.toString() + "', '" + context + "');";
+void postMessage(String data) {
+    String postMessageScript = "window.postMessage('" + data + "', '*');";
     webView.evaluateJavascript(postMessageScript, null);
 }
 ```
@@ -71,8 +64,11 @@ So, we got a communication line. An example handshake is like:
 class MessagingBridge {
     @JavascriptInterface
     public void send(String eventType, JSONObject payload){
-        if (eventType.equals("ready_for_data_injection")) {
-            postMessage("*", <your-data>);
+        JSONObject jsonData = new JSONObject(data);
+        String eventName = jsonData.optString("event", "");
+
+        if (eventName.equals("ready-for-injection")) {
+            postMessage(<your-data-here>);
         }
     }
 }
