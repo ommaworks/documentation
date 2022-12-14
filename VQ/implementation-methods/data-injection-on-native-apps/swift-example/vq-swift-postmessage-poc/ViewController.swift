@@ -11,7 +11,7 @@ import WebKit
 class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDelegate {
 
     var webView: WKWebView?
-    let contentURL = "https://play-test.omma.io/c/x3dASS/index.html"
+    let contentURL = "https://play.omma.io/c/C5wzQ9/index.html"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +55,10 @@ class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDele
                 let response: [String : Any] = [
                     "event": "inject",
                     "payload": [
-                        "name": "world",
+                        "segment": "A",
+                        "name": "John",
+                        "accountBalance": 1500,
+                        "creditCardLimit": 2500,
                     ]
                 ]
 
