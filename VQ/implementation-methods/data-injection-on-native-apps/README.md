@@ -107,13 +107,13 @@ let contentController = webView.configuration.userContentController
 contentController.add(self, name: "vqHandler")
 ```
 
-Now, we'll inject a code that sends every `VQEvent` triggered in javascript side to native side:
+Now, we'll inject a code that proxies `ready-for-injection` event from javascript side to native side:
 
 ```swift
 let js = """
     window.addEventListener('message', function(e) {
-        const event = JSON.parse(e.data);
-        if (event.name === 'VQEvent') {
+        const data = JSON.parse(e.data);
+        if (data.name === 'ready-for-injection') {
             window.webkit.messageHandlers.vqHandler.postMessage(event);
         }
     });
@@ -122,7 +122,7 @@ let script = WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFr
 contentController.addUserScript(script)
 ```
 
-To recieve these `VQEvent`s, your implentor class must implement `WKScriptMessageHandler` protocol.
+To recieve this event, your implentor class must implement `WKScriptMessageHandler` protocol.
 
 ```swift
 class ViewController: UIViewController, WKScriptMessageHandler {
@@ -135,17 +135,47 @@ Add the protocol method `userContentController(_:didReceive:)`. This method will
 ```swift
 func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
     if message.name == "vqHandler" {
-        print("Recieved VQEvent", message.body)
+        print("Recieved event", message.body)
     }
 }
 ```
 
-To send data back to javascript side:
+Let's create a method that sends data back to javascript side:
 
 ```swift
 func postMessage(_ data: String) {
     let js = "window.postMessage('\(data)', '*');"
     self.webView!.evaluateJavaScript(js)
+}
+```
+
+When we recieve `ready-for-injection` event, we want to respond back with related data:
+
+```swift
+func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    if message.name == "vqHandler" {
+        print("Recieved event", message.body)
+
+        let body = message.body as! [String: Any]
+        let eventName = body["event"] as! String
+
+        if eventName == "ready-for-injection" {
+            let response: [String : Any] = [
+                "event": "inject",
+                "payload": [
+                    // the data you want to inject
+                ]
+            ]
+
+            do {
+                let data = try JSONSerialization.data(withJSONObject: response)
+                let dataStr = String(data: data, encoding: String.Encoding.utf8)!
+                self.postMessage(dataStr)
+            } catch {
+                print("Could not json-stringify response: \(error)")
+            }
+        }
+    }
 }
 ```
 

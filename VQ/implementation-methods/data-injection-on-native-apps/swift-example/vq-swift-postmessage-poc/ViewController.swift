@@ -8,9 +8,10 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController, WKScriptMessageHandler {
+class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDelegate {
 
     var webView: WKWebView?
+    let contentURL = "https://play.omma.io/c/C5wzQ9/index.html"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +22,7 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         webConfiguration.mediaTypesRequiringUserActionForPlayback = []
         
         self.webView = WKWebView(frame: self.view.frame, configuration: webConfiguration)
+        self.webView?.navigationDelegate = self
         self.view.addSubview(self.webView!)
         
         let contentController = self.webView!.configuration.userContentController
@@ -28,16 +30,16 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         
         let js = """
             window.addEventListener('message', function(e) {
-                const event = JSON.parse(e.data);
-                if (event.name === 'VQEvent') {
-                    window.webkit.messageHandlers.vqHandler.postMessage(event);
+                const data = JSON.parse(e.data);
+                if (data.event === 'ready-for-injection') {
+                    window.webkit.messageHandlers.vqHandler.postMessage(data);
                 }
             });
         """
         let script = WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         contentController.addUserScript(script)
         
-        let url = URL(string: "https://play.omma.io/f8dda4724622a7821f14b3627b45a7ebf0d213c22130e54496e1d16dd13fefba/index.html")!
+        let url = URL(string: contentURL)!
         let request = URLRequest(url: url)
         self.webView!.load(request)
     }
@@ -47,19 +49,16 @@ class ViewController: UIViewController, WKScriptMessageHandler {
             print("message got", message.body)
             
             let body = message.body as! [String: Any]
-            let payload = body["payload"] as! [String: Any]
-            let eventName = payload["eventName"] as! String
+            let eventName = body["event"] as! String
             
-            if eventName == "ready_for_data_injection" {
+            if eventName == "ready-for-injection" {
                 let response: [String : Any] = [
-                    "eventName": "setVariables",
-                    "variables": [
-                        "payload": [
-                            "name1": "George Bluth",
-                            "image1": "https://reqres.in/img/faces/1-image.jpg",
-                            "name2": "Janet Weaver",
-                            "image2": "https://reqres.in/img/faces/2-image.jpg",
-                        ]
+                    "event": "inject",
+                    "payload": [
+                        "segment": "A",
+                        "name": "John",
+                        "accountBalance": 1500,
+                        "creditCardLimit": 2500,
                     ]
                 ]
 
@@ -77,6 +76,16 @@ class ViewController: UIViewController, WKScriptMessageHandler {
     func postMessage(_ data: String) {
         let js = "window.postMessage('\(data)', '*');"
         self.webView!.evaluateJavaScript(js)
+    }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if let response = navigationResponse.response as? HTTPURLResponse {
+            if response.url != nil && response.url!.absoluteString == contentURL && response.statusCode >= 400 {
+                print("Cannot open VQ Content. Unexpected response code: \(response.statusCode)")
+            }
+        }
+        
+        decisionHandler(.allow)
     }
 }
 
