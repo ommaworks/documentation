@@ -8,10 +8,10 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDelegate {
+class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDelegate, WKUIDelegate {
 
     var webView: WKWebView?
-    let contentURL = "https://play.omma.io/c/C5wzQ9/index.html"
+    let contentURL = "https://play-test.omma.io/c/__YTgz/index.html"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +23,7 @@ class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDele
         
         self.webView = WKWebView(frame: self.view.frame, configuration: webConfiguration)
         self.webView?.navigationDelegate = self
+        self.webView?.uiDelegate = self
         self.view.addSubview(self.webView!)
         
         let contentController = self.webView!.configuration.userContentController
@@ -86,6 +87,11 @@ class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDele
         }
         
         decisionHandler(.allow)
+    }
+    
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        self.webView!.load(navigationAction.request)
+        return nil
     }
 }
 
