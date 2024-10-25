@@ -57,7 +57,7 @@ class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDele
                     "event": "inject",
                     "payload": [
                         "segment": "A",
-                        "name": "John",
+                        "name": "Shaq O'Neal",
                         "accountBalance": 1500,
                         "creditCardLimit": 2500,
                     ]
@@ -75,7 +75,10 @@ class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDele
     }
     
     func postMessage(_ data: String) {
-        let js = "window.postMessage('\(data)', '*');"
+        // We need to escape single quotes, because we're passing it inside single quotes
+        let escapedData = data.replacingOccurrences(of: "'", with: "\\'")
+        
+        let js = "window.postMessage('\(escapedData)', '*');"
         self.webView!.evaluateJavaScript(js)
     }
     
