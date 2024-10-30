@@ -1,6 +1,7 @@
 # Native Data Injection with Post Message API
 The personalization of a VQ content boils down to evaluating the decision points and text values on run-time. Every `variable` that is referenced on a scene template can be replaced by its actual value.
 
+> This documentation only refers to a way of implementation. Please review it according to your own security definitions/concerns before use.
 
 ## Android Native Implementation
 There are two main things to run VQ content inside a native WebView:
@@ -54,7 +55,10 @@ window.postMessage(JSON.stringify({ <your-data> }), '*')
 Simply we can use a method to execute is from native side.
 ```java
 void postMessage(String data) {
-    String postMessageScript = "window.postMessage('" + data + "', '*');";
+    // We need to escape single quotes, because we're passing it inside single quotes
+    String escapedData = data.replace("'", "\\'");
+
+    String postMessageScript = "window.postMessage('" + escapedData + "', '*');";
     webView.evaluateJavascript(postMessageScript, null);
 }
 ```
@@ -140,7 +144,10 @@ Let's create a method that sends data back to javascript side:
 
 ```swift
 func postMessage(_ data: String) {
-    let js = "window.postMessage('\(data)', '*');"
+    // We need to escape single quotes, because we're passing it inside single quotes
+    let escapedData = data.replacingOccurrences(of: "'", with: "\\'")
+    
+    let js = "window.postMessage('\(escapedData)', '*');"
     self.webView!.evaluateJavaScript(js)
 }
 ```

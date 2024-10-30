@@ -13,7 +13,8 @@ export default function HomeScreen() {
   const webViewRef = useRef<WebView>(null);
 
   const userData = {
-    name: 'Jennifer',
+    segment: 'A',
+    name: `Shaq O'Neal`,
     accountBalance: 995,
     creditCardLimit: 3500
   };
@@ -24,11 +25,13 @@ export default function HomeScreen() {
       return;
     }
 
+    const message = JSON.stringify({
+      event: 'inject', 
+      payload: userData,
+    });
+
     webViewRef.current.injectJavaScript(`
-      window.postMessage(JSON.stringify({
-        event: 'inject', 
-        payload: ${JSON.stringify(userData)},
-      }), '*');
+      window.postMessage('${message.replace(/'/g, "\\'")}', '*');
 
       true;
     `);
@@ -50,7 +53,7 @@ export default function HomeScreen() {
           javaScriptEnabled
           domStorageEnabled
           startInLoadingState
-          source={{uri: `https://play.omma.io/c/_eq0DD/index.html?ts=${Date.now()}`}}
+          source={{uri: `https://play.omma.io/c/C5wzQ9/index.html?ts=${Date.now()}`}}
           injectedJavaScriptBeforeContentLoaded={`
             window.onerror = function(message, sourcefile, lineno, colno, error) {
               alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
