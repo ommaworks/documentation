@@ -82,7 +82,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void postMessage(String data) {
-        String postMessageScript = "window.postMessage('" + data + "', '*');";
+        // We need to escape single quotes, because we're passing it inside single quotes
+        String escapedData = data.replace("'", "\\'");
+
+        String postMessageScript = "window.postMessage('" + escapedData + "', '*');";
         webView.evaluateJavascript(postMessageScript, null);
     }
 
@@ -99,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 JSONObject payload = new JSONObject();
                                 payload.put("segment", "A");
-                                payload.put("name", "John");
+                                payload.put("name", "Shaq O'Neal");
                                 payload.put("accountBalance", 1500);
                                 payload.put("creditCardLimit", 2500);
 
