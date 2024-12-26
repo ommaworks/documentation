@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebContentsDebuggingEnabled(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         webView.addJavascriptInterface(new MessagingBridge(), "MessagingBridge");
 
         webView.loadUrl(contentUrl);
